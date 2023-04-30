@@ -26,5 +26,5 @@ server/deleteDB.txt
 deployment/server_variables.env
 deployment/client_variables.env
 
-*dunkin
-server/xml_files/*
+*dunkin*.xml
+server/xml_files/*dunkin*.xml
