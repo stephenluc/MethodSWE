@@ -17,16 +17,19 @@ import ListEntry from './ListEntry';
 
 // function
 import { 
-  getPaymentBatch,
-  acceptPaymentBatch,
-  rejectPaymentBatch
+  updatePendingPaymentBatch
 } from "../api/payment_batch";
 
-export default function ListView({ paymentBatches }) {
+export default function ListView({ paymentBatches, updatePaymentBatches }) {
   const [openId, setOpenId] = useState(null);
 
   const handleCollapseClick = (paymentId) => {
     setOpenId(paymentId === openId ? null : paymentId);
+  };
+
+  const onPendingClick = (paymentId, didAccept) => {
+    updatePendingPaymentBatch(paymentId, didAccept, updatePaymentBatches)
+      .then(() => updatePaymentBatches());
   };
 
   const listEntries = paymentBatches.map((payment) => {
@@ -36,6 +39,7 @@ export default function ListView({ paymentBatches }) {
         payment={payment}
         isOpen={openId === payment._id}
         onCollapseClick={handleCollapseClick}
+        onPendingClick={onPendingClick}
       />
     )
   });

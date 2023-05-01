@@ -15,9 +15,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 // components
 import ExpandedEntry from './ExpandedEntry';
 
-// functions
-import { updatePendingPaymentBatch } from "../api/payment_batch";
-
 function buildStatusChip(status) {
     const colorCode = {
 		'processing': 'primary',
@@ -36,16 +33,12 @@ function buildStatusChip(status) {
     );
 }
 
-function ListEntry({ payment, isOpen, onCollapseClick }) {
+function ListEntry({ payment, isOpen, onCollapseClick, onPendingClick }) {
 	const paymentId = payment._id;
 	const { fileName } = payment;
-	const [status, setStatus] = useState(payment.status);
+	const status = payment.status;
 
 	const hasAccepted = !(['rejected', 'processing'].includes(status));
-
-	const onPendingClick = (paymentId, didAccept) => {
-	  updatePendingPaymentBatch(paymentId, didAccept, setStatus);
-	};
 
     const pendingButtons = (
       <Stack spacing={2} direction="row">

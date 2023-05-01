@@ -1,33 +1,30 @@
 import axios from "axios";
 
-export async function getPaymentBatches(setPaymentBatches) {
+export async function getPaymentBatches() {
     try {
 		const res = await fetch(`payment_batch`);
-		const data = await res.json();
-		setPaymentBatches(data);
+		return await res.json();
 	} catch (err) {
 		console.log(err)
 	}
 };
 
-export async function getPaymentBatch(batchId, setPayments) {
+export async function getPaymentBatch(batchId) {
 	try {
 		const res = await fetch(`payment_batch/${batchId}`);
-		const data = await res.json();
-		setPayments(data);
+		return await res.json();
 	} catch (err) {
 		console.log(err)
 	}
 };
 
-export async function updatePendingPaymentBatch(batchId, didAccept, setStatus) {
+export async function updatePendingPaymentBatch(batchId, didAccept) {
 	try {
 		const isAccepted = didAccept ? 'accept' : 'reject';
 		const res = await fetch(`payment_batch/${batchId}/${isAccepted}`, {
 			method: "PUT",
 		});
-		const data = await res.json();
-		setStatus(data.status);
+		return await res.json();
 	} catch (err) {
 		console.log(err)
 	}

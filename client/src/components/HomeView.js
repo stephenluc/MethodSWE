@@ -25,21 +25,21 @@ export default function HomeView() {
   const [page, setPage] = useState(0);
 
   const [paymentBatches, setPaymentBatches] = useState([]);
+
   useEffect(() => {
-    getPaymentBatches(setPaymentBatches);
-  }, []);
+    getPaymentBatches().then((data) => setPaymentBatches(data));
+  }, [page]);
 
   const onUploadResponse = (res) => {
     setSnackBar({isOpen: true, uploadRes: res})
   };
 
-  const updatePaymentBatches = (data) => {
-    paymentBatches.unshift(data);
+  const updatePaymentBatches = () => {
     // worry about pagination later
     // if (paymentBatches.length > MAX_PAGE_SIZE) {
     //   paymentBatches.pop();
     // }
-    setPaymentBatches(paymentBatches);
+    getPaymentBatches().then((data) => setPaymentBatches(data));
   }
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
@@ -57,7 +57,10 @@ export default function HomeView() {
         onUploadResponse={onUploadResponse}
         updatePaymentBatches={updatePaymentBatches}
       /> 
-      <ListView paymentBatches={paymentBatches}/>
+      <ListView 
+        paymentBatches={paymentBatches}
+        updatePaymentBatches={updatePaymentBatches}
+      />
       <Snackbar 
         open={isOpen} 
         autoHideDuration={3000} 

@@ -26,7 +26,13 @@ export default function UploadFilesButton({ onUploadResponse, updatePaymentBatch
     }
     let formData = new FormData();
     formData.append('file', file);
-    uploadFile(formData, onUploadResponse, updatePaymentBatches);
+    uploadFile(formData, onUploadResponse).then(res => {
+        onUploadResponse(res.ok ? "success" : "error");
+        return res.json();
+    }).then(data => {
+      updatePaymentBatches();
+      return data;
+    }).catch(err => onUploadResponse("error"));
   }
 
   return (
