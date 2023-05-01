@@ -1,7 +1,8 @@
 export async function getPaymentBatches() {
     try {
 		const res = await fetch(`payment_batch`);
-		return await res.json();
+		const data = res.json();
+		return data;
 	} catch (err) {
 		console.log(err)
 	}

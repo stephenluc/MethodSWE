@@ -8,7 +8,7 @@ import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-function ExpandedEntry({ payment, updatePaymentBatches }) {
+function ExpandedEntry({ payment, refetchPaymentBatches }) {
     const {
       fundsPerBranch,
       fundsPerSource,

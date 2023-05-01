@@ -24,21 +24,22 @@ export default function HomeView() {
 
   const [paymentBatches, setPaymentBatches] = useState([]);
 
+  const fetchPaymentBatches = async () => {
+    const data = await getPaymentBatches()
+    setPaymentBatches(data);
+    return data
+  }
+
   useEffect(() => {
-    getPaymentBatches().then((data) => setPaymentBatches(data));
-  }, [page]);
+    const fetch = async () => {
+        await fetchPaymentBatches();
+    };
+    fetch();
+  }, []);
 
   const onUploadResponse = (res) => {
     setSnackBar({isOpen: true, uploadRes: res})
   };
-
-  const updatePaymentBatches = () => {
-    // worry about pagination later
-    // if (paymentBatches.length > MAX_PAGE_SIZE) {
-    //   paymentBatches.pop();
-    // }
-    getPaymentBatches().then((data) => setPaymentBatches(data));
-  }
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -53,11 +54,11 @@ export default function HomeView() {
       </Box>
       <UploadFilesButton 
         onUploadResponse={onUploadResponse}
-        updatePaymentBatches={updatePaymentBatches}
+        refetchPaymentBatches={fetchPaymentBatches}
       /> 
       <ListView 
         paymentBatches={paymentBatches}
-        updatePaymentBatches={updatePaymentBatches}
+        refetchPaymentBatches={fetchPaymentBatches}
       />
       <Snackbar 
         open={isOpen} 

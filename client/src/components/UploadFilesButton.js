@@ -11,26 +11,26 @@ import "../App.css"
 // functions
 import { uploadFile } from "../api/upload_file";
 
-export default function UploadFilesButton({ onUploadResponse, updatePaymentBatches }) {
-  const [file, setFile] = useState();
+export default function UploadFilesButton({ onUploadResponse, refetchPaymentBatches }) {
+  const [file, setFile] = useState(null);
 
-  function handleFile(event) {
+  const handleFile = (event) => {
     setFile(event.target.files[0]);
   }
 
-  function handleUploadFile() {
-    if (file === undefined) {
+  const handleUploadFile = async () => {
+    if (!file) {
       return;
     }
-    let formData = new FormData();
-    formData.append('file', file);
-    uploadFile(formData, onUploadResponse).then(res => {
-        onUploadResponse(res.ok ? "success" : "error");
-        return res.json();
-    }).then(data => {
-      updatePaymentBatches();
-      return data;
-    }).catch(err => onUploadResponse("error"));
+    try {
+      let formData = new FormData();
+      formData.append('file', file);
+      const res = await uploadFile(formData)
+      onUploadResponse(res.ok ? "success" : "error");
+      refetchPaymentBatches();
+    } catch(err) {
+      onUploadResponse("error")
+    };
   }
 
   return (

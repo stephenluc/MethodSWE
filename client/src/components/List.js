@@ -6,7 +6,7 @@ import List from '@mui/material/List';
 // components
 import ListEntry from './ListEntry';
 
-export default function ListView({ paymentBatches, updatePaymentBatches }) {
+export default function ListView({ paymentBatches, refetchPaymentBatches }) {
   const [openId, setOpenId] = useState(null);
 
   const handleCollapseClick = (paymentId) => {
@@ -20,7 +20,7 @@ export default function ListView({ paymentBatches, updatePaymentBatches }) {
         payment={payment}
         isOpen={openId === payment._id}
         onCollapseClick={handleCollapseClick}
-        updatePaymentBatches={updatePaymentBatches}
+        refetchPaymentBatches={refetchPaymentBatches}
       />
     )
   });
