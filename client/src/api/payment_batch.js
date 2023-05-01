@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export async function getPaymentBatches() {
     try {
 		const res = await fetch(`payment_batch`);
@@ -9,14 +7,14 @@ export async function getPaymentBatches() {
 	}
 };
 
-export async function getPaymentBatch(batchId) {
-	try {
-		const res = await fetch(`payment_batch/${batchId}`);
-		return await res.json();
-	} catch (err) {
-		console.log(err)
-	}
-};
+// export async function getPaymentBatch(batchId) {
+// 	try {
+// 		const res = await fetch(`payment_batch/${batchId}`);
+// 		return await res.json();
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// };
 
 export async function updatePendingPaymentBatch(batchId, didAccept) {
 	try {

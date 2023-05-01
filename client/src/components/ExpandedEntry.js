@@ -1,24 +1,17 @@
 // mui components
-import Box from '@mui/material/Box';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Divider from '@mui/material/Divider';
 
 // rechart components
-import { PieChart, Pie, Sector, Cell, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function ExpandedEntry({ payment, updatePaymentBatches }) {
-    const paymentId = payment._id;
     const {
-      totalFunds,
       fundsPerBranch,
       fundsPerSource,
-      numOfPayments,
       status
     } = payment;
     

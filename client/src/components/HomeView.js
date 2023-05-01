@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 // mui components
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -13,16 +12,15 @@ import UploadFilesButton from './UploadFilesButton';
 // functions
 import { 
   getPaymentBatches,
-  getPaymentBatch,
 } from "../api/payment_batch";
 
-const MAX_PAGE_SIZE = 10;
+// const MAX_PAGE_SIZE = 10;
 
 export default function HomeView() {
   const [snackBar, setSnackBar] = useState({isOpen: false, uploadRes: "success"});
   const { isOpen, uploadRes } = snackBar
 
-  const [page, setPage] = useState(0);
+  // const [page, setPage] = useState(0);
 
   const [paymentBatches, setPaymentBatches] = useState([]);
 

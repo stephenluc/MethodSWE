@@ -1,7 +1,4 @@
-import { useState } from "react";
-
 // mui components
-import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
@@ -36,10 +33,6 @@ function buildStatusChip(status) {
     return (
     	<Chip variant="outlined" label={statusCode[status]} color={colorCode[status]}/>
     );
-}
-
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleString('en-US');
 }
 
 function ListEntry({ payment, isOpen, onCollapseClick, updatePaymentBatches }) {

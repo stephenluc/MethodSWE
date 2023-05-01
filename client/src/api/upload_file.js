@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export async function uploadFile(formData, onUploadResponse) {
 	try {
 		const res = await fetch(`upload_file`, {

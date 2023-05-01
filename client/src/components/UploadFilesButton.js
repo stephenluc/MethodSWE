@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import FormData from "form-data";
-import axios from "axios";
 
 // mui components
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
 
 // css
 import "../App.css"
@@ -21,7 +19,7 @@ export default function UploadFilesButton({ onUploadResponse, updatePaymentBatch
   }
 
   function handleUploadFile() {
-    if (file == undefined) {
+    if (file === undefined) {
       return;
     }
     let formData = new FormData();

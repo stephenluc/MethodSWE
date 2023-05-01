@@ -1,16 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // mui components
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import Collapse from '@mui/material/Collapse';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import ListItemButton from '@mui/material/ListItemButton';
 
 // components
 import ListEntry from './ListEntry';
