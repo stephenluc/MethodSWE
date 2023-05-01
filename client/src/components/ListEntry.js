@@ -91,7 +91,7 @@ function ListEntry({ payment, isOpen, onCollapseClick, updatePaymentBatches }) {
           	sx={{ width: '90%'}}
           	onClick={() => onCollapseClick(paymentId)
           }>
-	          <ListItemText primary={fileName} secondary={formattedDate} />
+	          <ListItemText sx={{ 'flex-grow': 0, mr: 5 }} primary={fileName} secondary={formattedDate} />
 	          <ListItemText primary={`Total Paid: $${totalFunds}`} secondary={`Number of Payments: ${numOfPayments}`}/>
           </Stack>
           {statusButtons}
