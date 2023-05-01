@@ -26,7 +26,6 @@ app.use(urlencoded({ extended: false }));
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.static('./xml_files'));
 
-
 // // routes
 const routes = require("./routes/routes");
 app.use("/", routes);
