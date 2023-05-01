@@ -15,6 +15,11 @@ import ListItemButton from '@mui/material/ListItemButton';
 // components
 import ExpandedEntry from './ExpandedEntry';
 
+// functions
+import { 
+  updatePendingPaymentBatch
+} from "../api/payment_batch";
+
 function buildStatusChip(status) {
     const colorCode = {
 		'processing': 'primary',
@@ -33,46 +38,70 @@ function buildStatusChip(status) {
     );
 }
 
-function ListEntry({ payment, isOpen, onCollapseClick, onPendingClick }) {
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleString('en-US');
+}
+
+function ListEntry({ payment, isOpen, onCollapseClick, updatePaymentBatches }) {
 	const paymentId = payment._id;
-	const { fileName } = payment;
+	const { totalFunds, fileName, createdDate, numOfPayments } = payment;
+	const formattedDate = new Date(createdDate).toLocaleString('en-US');
 	const status = payment.status;
 
-	const hasAccepted = !(['rejected', 'processing'].includes(status));
+	const onPendingClick = (paymentId, didAccept) => {
+      updatePendingPaymentBatch(paymentId, didAccept, updatePaymentBatches)
+        .then(() => updatePaymentBatches());
+    };
+    const isPending = status === "pending";
 
-    const pendingButtons = (
-      <Stack spacing={2} direction="row">
-        <Button 
-          variant="contained"
-          color="success"
-          onClick={() => onPendingClick(paymentId, true)}
-        >
-          Accept
-        </Button>
-        <Button 
-          variant="contained"
-          color="error"
-          onClick={() => onPendingClick(paymentId, false)}
-        >
-          Reject
-        </Button>
+    const statusButtons = (
+      <Stack spacing={1.5} direction="row" justifyContent="flex-end" alignItems="center">
+        {isPending && (
+        	<>
+        	<Button
+        	  size="small"
+	          variant="contained"
+	          color="success"
+	          onClick={() => onPendingClick(paymentId, true)}
+	        >
+	          Accept
+	        </Button>
+	        <Button 
+	          size="small"
+	          variant="contained"
+	          color="error"
+	          onClick={() => onPendingClick(paymentId, false)}
+	        >
+	          Reject
+	        </Button>
+	        </>
+	    )}
+        {buildStatusChip(status)}
+        {isOpen ? <ExpandLess onClick={() => onCollapseClick(paymentId)}/> : <ExpandMore onClick={() => onCollapseClick(paymentId)}/>}
       </Stack>
     );
 
     return (
       <>
-        <ListItemButton onClick={() => onCollapseClick(paymentId)}>
-          <ListItemText primary={paymentId} secondary={fileName} />
-          {pendingButtons}
-          {buildStatusChip(status)}
-          {isOpen ? <ExpandLess /> : <ExpandMore />}
+        <ListItemButton alignItems="center">
+          <Stack
+          	justifyContent="flex-start"
+		  	alignItems="center"
+          	direction="row"
+          	sx={{ width: '90%'}}
+          	onClick={() => onCollapseClick(paymentId)
+          }>
+	          <ListItemText primary={fileName} secondary={formattedDate} />
+	          <ListItemText primary={`Total Paid: $${totalFunds}`} secondary={`Number of Payments: ${numOfPayments}`}/>
+          </Stack>
+          {statusButtons}
         </ListItemButton>
         <Collapse in={isOpen} timeout="auto" unmountOnExit>
-          <ExpandedEntry payment={payment} />
+          <ExpandedEntry payment={payment} updatePaymentBatches={updatePaymentBatches} />
         </Collapse>
         <Divider component="li" />
       </>
-      )
+    )
 }
 
 export default ListEntry;
