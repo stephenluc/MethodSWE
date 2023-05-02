@@ -2,19 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 // import controllers
-const { 
-	getPaymentBatch,
-	getPayments,
-	updatePendingPaymentBatch
-} = require("../controllers/payment_batch");
-const { uploadFile } = require("../controllers/upload_file");
-
-// import middlewares
+const paymentBatch = require("../controllers/payment_batch");
+const uploadFile = require("../controllers/upload_file");
 
 // api routes
-router.get("/payment_batch", getPaymentBatch);
-router.get("/payment_batch/:id", getPayments);
-router.put("/payment_batch/:id/:pending_status", updatePendingPaymentBatch);
-router.post("/upload_file", uploadFile);
+router.use("/payment_batch", paymentBatch);
+router.use("/upload_file", uploadFile);
 
 module.exports = router;

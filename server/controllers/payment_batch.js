@@ -1,9 +1,12 @@
-const PaymentBatch = require('../models/PaymentBatch');
-const { Payment } = require('../models/Payment');
+const express = require("express");
+const PaymentBatch = require('../models/PaymentBatchModel');
+const { Payment } = require('../models/PaymentModel');
+
+const router = express.Router();
 
 const MAX_PAGE_SIZE = 10;
 
-exports.getPaymentBatch = async (req, res) => {
+router.get('/', async (req, res) => {
 	try {
 		// worry about pagination later .limit(MAX_PAGE_SIZE)
 		const paymentBatch = await PaymentBatch.find().sort( {createdDate: -1 });
@@ -12,9 +15,9 @@ exports.getPaymentBatch = async (req, res) => {
 		console.log(err);
 		return res.status(500);
 	}
-};
+});
 
-exports.getPayments = async (req, res) => {
+router.get('/:id', async (req, res) => {
 	try {
 		const paymentBatchId = req.params.id
 		const payments = await Payment.findByPaymentBatchID(paymentBatchId);
@@ -23,12 +26,12 @@ exports.getPayments = async (req, res) => {
 		console.log(err);
 		return res.status(500);
 	}
-};
+});
 
-exports.updatePendingPaymentBatch = async (req, res) => {
+router.put('/:id/:status', async (req, res) => {
 	try {
 		const paymentBatchId = req.params.id
-		const status = req.params.pending_status
+		const status = req.params.status
 		const convertedStatus = status === 'reject' ? 'rejected' : 'processing';
 		Payment.updateStatusByPaymentBatchId(paymentBatchId, convertedStatus);
 		const paymentBatch = await PaymentBatch.findById(paymentBatchId);
@@ -39,4 +42,6 @@ exports.updatePendingPaymentBatch = async (req, res) => {
 		console.log(err);
 		return res.status(500);
 	}
-};
+});
+
+module.exports = router;

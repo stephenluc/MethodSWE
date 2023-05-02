@@ -28,7 +28,7 @@ app.use(express.static('./xml_files'));
 
 // // routes
 const routes = require("./routes/routes");
-app.use("/", routes);
+app.use(routes);
 
 // port
 const port = process.env.PORT || 8080;
