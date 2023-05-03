@@ -11,9 +11,9 @@ async function getPayee(holderId, merchantId, loanAccountNumber) {
     })
 }
 
-async function createPayee(entId, holderId, merchantId, loanAccountNumber) {
+async function createPayee(accId, holderId, merchantId, loanAccountNumber) {
     const payee = new Payee({
-        entId,
+        accId,
         holderId,
         merchantId,
         loanAccountNumber
@@ -39,7 +39,6 @@ async function fetchPayee(employee, payee) {
         });
         return await createPayee(methodPayeeAccount.id, individual.entId, merchant.mchId, loanAccountNumber);
     }
-
     return payeeAcc;
 }
 

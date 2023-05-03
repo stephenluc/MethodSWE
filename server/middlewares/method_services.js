@@ -39,10 +39,24 @@ const createCorporation = async (data) => {
     });
 };
 
+const createPayment = async (data) => {
+    return await throttler.addRequest(async () => {
+        return await method.payments.create(data);
+    });
+};
+
+const getPayment = async (id) => {
+    return await throttler.addRequest(async () => {
+        return await method.payments.get(id);
+    });
+};
+
 module.exports = {
     createCorporation,
     createIndividual,
     createCheckingAccount,
     createPayeeAccount,
+    createPayment,
+    getPayment,
     fetchMerchant,
 };

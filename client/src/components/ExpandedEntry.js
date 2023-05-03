@@ -1,14 +1,16 @@
 // mui components
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+
+// components
+import DownloadCSVButton from './DownloadCSVButton';
 
 // rechart components
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
-
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function ExpandedEntry({ payment, refetchPaymentBatches }) {
+    const paymentId = payment._id;
     const {
       fundsPerBranch,
       fundsPerSource,
@@ -29,30 +31,21 @@ function ExpandedEntry({ payment, refetchPaymentBatches }) {
     const isCompleted = status === "completed";
     const csvButtons = (
       <Stack spacing={2} sx={{ mx: 2 }} direction="row" justifyContent="flex-end" alignItems="center">
-          <Button
-            size="small"
-            variant="contained"
-            color="success"
-            disabled={!isCompleted}
-          >
-            Funds Per Source
-          </Button>
-          <Button 
-            size="small"
-            variant="contained"
-            color="success"
-            disabled={!isCompleted}
-          >
-            Funds Per Branch
-          </Button>
-          <Button 
-            size="small"
-            variant="contained"
-            color="success"
-            disabled={!isCompleted}
-          >
-            All Payments
-          </Button>
+          <DownloadCSVButton
+            paymentId={paymentId}
+            title={"funds_per_branch"}
+            canDownload={!isCompleted}
+          />
+          <DownloadCSVButton
+            paymentId={paymentId}
+            title={"funds_per_source"}
+            canDownload={!isCompleted}
+          />
+          <DownloadCSVButton
+            paymentId={paymentId}
+            title={"all_payments"}
+            canDownload={!isCompleted}
+          />
       </Stack>
     );
 
@@ -66,7 +59,7 @@ function ExpandedEntry({ payment, refetchPaymentBatches }) {
               data={branchFunds}
               cx={200}
               cy={200}
-              outerRadius={160}
+              outerRadius={120}
               fill="#8884d8"
               label
               nameKey="name"
@@ -85,7 +78,7 @@ function ExpandedEntry({ payment, refetchPaymentBatches }) {
               data={sourceFunds}
               cx={200}
               cy={200}
-              outerRadius={160}
+              outerRadius={120}
               fill="#8884d8"
               label
               nameKey="name"

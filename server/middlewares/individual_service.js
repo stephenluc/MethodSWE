@@ -12,14 +12,25 @@ async function getIndividual(dunkinId) {
     return await Individual.findOne({ dunkinId });
 }
 
-async function createIndividual(entId, dunkinId, branchId) {
-    const individual = new Individual({
-        entId,
+async function createIndividual(methodIndividual, dunkinId, branchId) {
+    const {
+        id,
+        individual
+    } = methodIndividual;
+    const individualMap = {
+        firstName: individual.first_name,
+        lastName: individual.last_name,
+        phoneNumber: individual.phone,
+        dob: individual.dob,
+    };
+    const ind = new Individual({
+        entId: id,
+        individual: individualMap,
         dunkinId,
         branchId
     });
-    individual.save();
-    return individual;
+    ind.save();
+    return ind;
 }
 
 async function fetchIndividual(employee) {
@@ -35,7 +46,7 @@ async function fetchIndividual(employee) {
                 dob: formatDate(employee.DOB)
             }
         });
-        return await createIndividual(methodIndividual.id, dunkinId, employee.DunkinBranch[0]);
+        return await createIndividual(methodIndividual, dunkinId, employee.DunkinBranch);
     }
     return individual;
 }

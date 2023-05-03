@@ -8,6 +8,7 @@ import Collapse from '@mui/material/Collapse';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ListItemButton from '@mui/material/ListItemButton';
+import Tooltip from '@mui/material/Tooltip';
 
 // components
 import ExpandedEntry from './ExpandedEntry';
@@ -18,20 +19,37 @@ import {
 } from "../api/payment_batch";
 
 const buildStatusChip = (status) => {
-    const colorCode = {
-		'processing': 'primary',
-		'completed': 'success',
-		'rejected': 'error',
-		'pending': 'warning'
-	};
-	const statusCode = {
-		'processing': 'PROCESSING',
-		'completed': 'COMPLETED',
-		'rejected': 'REJECTED',
-		'pending': 'PENDING'
+    const statusCode = {
+		'processing': {
+      color: 'primary',
+      label: 'PROCESSING',
+      title: 'Payments are being processed. Check back later by refreshing the page.'
+    },
+		'completed': {
+      color: 'success',
+      label: 'COMPLETED',
+      title: 'Payments are fulfilled. CSV reports are now downloadable.'
+    },
+		'rejected': {
+      color: 'error',
+      label: 'REJECTED',
+      title: 'Payments were rejected by user.',
+    },
+		'pending': {
+      color: 'warning',
+      label: 'PENDING',
+      title: 'Payments are pending. Review the file details and accept or reject the payments.'
+    },
+    'uploading': {
+      color: 'info',
+      label: 'UPLOADING',
+      title: 'File is being uploaded. Check back later by refreshing the page.'
+    },
 	};
     return (
-    	<Chip variant="outlined" label={statusCode[status]} color={colorCode[status]}/>
+      <Tooltip title={statusCode[status].title}>
+    	 <Chip variant="outlined" label={statusCode[status].label} color={statusCode[status].color}/>
+      </Tooltip>
     );
 };
 

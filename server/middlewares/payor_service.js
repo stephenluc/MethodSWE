@@ -10,9 +10,9 @@ async function getPayor(holderId, routingNumber, accountNumber) {
     });
 }
 
-async function createPayor(entId, holderId, routingNumber, accountNumber) {
+async function createPayor(accId, holderId, routingNumber, accountNumber) {
     const payor = new Payor({
-        entId,
+        accId,
         holderId,
         routingNumber,
         accountNumber

@@ -28,13 +28,13 @@ function compileBatchSummary(payments) {
 
       // estimate funds per branch
       const dunkinBranch = payment.Employee.DunkinBranch;
-      const fundAtBranch = dollarToCents(fundsPerBranch.get(dunkinBranch)) || 0;
-      fundsPerBranch.set(dunkinBranch, toDollarNum(fundAtBranch + amount));
+      const fundAtBranch = fundsPerBranch.get(dunkinBranch) || 0;
+      fundsPerBranch.set(dunkinBranch, fundAtBranch + amount);
 
       // estimate funds per source
       const sourceId = payment.Payor.DunkinId;
-      const fundAtSource = dollarToCents(fundsPerSource.get(sourceId)) || 0;
-      fundsPerSource.set(sourceId, toDollarNum(fundAtSource + amount));
+      const fundAtSource = fundsPerSource.get(sourceId) || 0;
+      fundsPerSource.set(sourceId, fundAtSource + amount);
 
       // total amount of funds giving out
       totalFunds += amount;
@@ -43,6 +43,14 @@ function compileBatchSummary(payments) {
       numOfInvalidRecords++;
     } 
   });
+
+  for (const [key, value] of fundsPerBranch) {
+    fundsPerBranch.set(key, toDollarNum(value));
+  }
+
+  for (const [key, value] of fundsPerSource) {
+    fundsPerSource.set(key, toDollarNum(value));
+  }
 
   totalFunds = toDollarNum(totalFunds)
   return {
@@ -55,12 +63,17 @@ function compileBatchSummary(payments) {
 }
 
 async function buildPayment(batchId, payment) {
-  const payor = await fetchPayor(payment.Payor);
-  const payee = await fetchPayee(payment.Employee, payment.Payee);
-  const amount = toCents(payment.Amount);
+  try {
+    const payor = await fetchPayor(payment.Payor);
+    const payee = await fetchPayee(payment.Employee, payment.Payee);
+    const amount = toCents(payment.Amount);
 
-  const record = await createPayment(batchId, payor.entId, payee.entId, toDollarNum(amount));
-  return record;
+    const record = await createPayment(batchId, payor.accId, payee.accId, amount);
+    console.log(`built payment: ${record}`);
+    return record;
+  } catch (err) {
+    console.error(`Error while building payment: ${err.message}`);
+  }
 }
 
 async function parseFromFile(data, fileName) {
@@ -68,15 +81,20 @@ async function parseFromFile(data, fileName) {
     // initialize a paymentBatch Record
     const batchRecord = new PaymentBatch({
       fileName: fileName,
-      status: "pending"
+      status: "uploading"
     });
 
     const dataList = toList(data);
     // iterate through all the rows in the xml file, ignore malformed rows
-    dataList.forEach(async (payment) => {
+    Promise.all(dataList.map(async (payment) => {
       if (validatePayment(payment)) {
         await buildPayment(batchRecord._id, payment);
-      }        
+      }
+    })).then(async () => {
+      await PaymentBatch.updateOne({ _id: batchRecord._id }, { status: 'pending' });
+      console.log("All payments have been processed successfully.");
+    }).catch((error) => {
+      console.log(`Error processing payments: ${error}`);
     });
 
     const {
@@ -94,8 +112,8 @@ async function parseFromFile(data, fileName) {
     batchRecord.save();
     return batchRecord;
   } catch (e) {
-    console.log("error:", e);
+    console.log("error while parsing file:", e);
   }
 }
 
-module.exports = {parseFromFile}
+module.exports = { parseFromFile }

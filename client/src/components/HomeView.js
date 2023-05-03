@@ -14,13 +14,10 @@ import {
   getPaymentBatches,
 } from "../api/payment_batch";
 
-// const MAX_PAGE_SIZE = 10;
 
 export default function HomeView() {
   const [snackBar, setSnackBar] = useState({isOpen: false, uploadRes: "success"});
   const { isOpen, uploadRes } = snackBar
-
-  // const [page, setPage] = useState(0);
 
   const [paymentBatches, setPaymentBatches] = useState([]);
 
@@ -56,10 +53,12 @@ export default function HomeView() {
         onUploadResponse={onUploadResponse}
         refetchPaymentBatches={fetchPaymentBatches}
       /> 
-      <ListView 
-        paymentBatches={paymentBatches}
-        refetchPaymentBatches={fetchPaymentBatches}
-      />
+      {paymentBatches.length === 0 ? (<h3>No Files Have Been Submited</h3>): (
+        <ListView 
+          paymentBatches={paymentBatches}
+          refetchPaymentBatches={fetchPaymentBatches}
+        />
+      )}
       <Snackbar 
         open={isOpen} 
         autoHideDuration={3000} 

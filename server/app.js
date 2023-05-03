@@ -35,5 +35,7 @@ const port = process.env.PORT || 8080;
 
 // listener
 const server = app.listen(port, () =>
-	console.log(`Server is running on port ${port}`)
+	console.log(
+		`Hi, is your server running? ~~Yes, on port ${port} ~~... well you better go catch it!`
+	)
 );

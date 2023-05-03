@@ -5,13 +5,31 @@ async function getCorporation(dunkinId) {
     return await Corporation.findOne({ corpId: dunkinId });
 }
 
-async function createCorporation(entId, corpId) {
-    const corporation = new Corporation({
-        entId,
-        corpId
+async function createCorporation(methodCorporation, corpId) {
+    const {
+        id,
+        corporation,
+        address
+    } = methodCorporation;
+    const corpMap = {
+        name: corporation.name,
+        dba: corporation.dba,
+        ein: corporation.ein,
+    };
+    const addressMap = {
+        line1: address.line1,
+        city: address.city,
+        state: address.state,
+        zip: address.zip,
+    };
+    const corp = new Corporation({
+        entId: id,
+        corpId,
+        corporation: corpMap,
+        address: addressMap
     });
-    corporation.save();
-    return corporation;
+    corp.save();
+    return corp;
 }
 
 async function fetchCorporation(payor) {
@@ -19,7 +37,7 @@ async function fetchCorporation(payor) {
     const corporation = await getCorporation(dunkinId);
     if (!corporation) {
         const address = payor.Address
-        const methodEntity = await Method.createCorporation({
+        const methodCorporation = await Method.createCorporation({
             type: 'c_corporation',
             corporation: {
                 name: payor.Name,
@@ -35,7 +53,7 @@ async function fetchCorporation(payor) {
                 zip: '50613' // MethodInvalidRequestError: Invalid zip code for state provided.
             }
         });
-        return await createCorporation(methodEntity.id, dunkinId)
+        return await createCorporation(methodCorporation, dunkinId)
     }
     return corporation;
 }
