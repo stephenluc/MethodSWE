@@ -1,6 +1,11 @@
 const Method = require('./method_services');
 const Individual = require('../models/IndividualModel');
 
+const { promisify } = require('util');
+const sleep = promisify(setTimeout);
+
+const cache = new Map();
+
 const HARD_CODE_PHONE_NUMBER = '+15121231111'; // per instructions
 
 function formatDate(date) {
@@ -29,24 +34,40 @@ async function createIndividual(methodIndividual, dunkinId, branchId) {
         dunkinId,
         branchId
     });
-    ind.save();
+    await ind.save();
+    cache.set(dunkinId, ind);
     return ind;
 }
 
 async function fetchIndividual(employee) {
     const dunkinId = employee.DunkinId;
     const individual = await getIndividual(dunkinId);
-    if (!individual) {
-        const methodIndividual = await Method.createIndividual({
-            type: 'individual',
-            individual: {
-                first_name: employee.FirstName,
-                last_name: employee.LastName,
-                phone: HARD_CODE_PHONE_NUMBER,
-                dob: formatDate(employee.DOB)
+    try {
+        if (!individual) {
+            if (!cache.has(dunkinId)) {
+                cache.set(dunkinId, false);
+            } else {
+                while(cache.has(dunkinId)){
+                    await sleep(1500);
+                    if (cache.get(dunkinId) !== false){
+                        return cache.get(dunkinId);
+                    }
+                }
             }
-        });
-        return await createIndividual(methodIndividual, dunkinId, employee.DunkinBranch);
+            const methodIndividual = await Method.createIndividual({
+                type: 'individual',
+                individual: {
+                    first_name: employee.FirstName,
+                    last_name: employee.LastName,
+                    phone: HARD_CODE_PHONE_NUMBER,
+                    dob: formatDate(employee.DOB)
+                }
+            });
+            return await createIndividual(methodIndividual, dunkinId, employee.DunkinBranch);
+        }
+    } catch (err) {
+        console.error(`Error in individual fetch ${err}`)
+        cache.delete(dunkinId);
     }
     return individual;
 }

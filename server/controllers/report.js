@@ -10,7 +10,7 @@ router.get('/:id/:report_name', async (req, res) => {
 		const report = await generateReport(batchId, report_name);
 		return res.status(200).send(report);
     } catch (err) {
-		console.log(`Error generating report ${err}`);
+		console.error(`Error generating report ${err}`);
 		return res.status(500);
 	}
 });

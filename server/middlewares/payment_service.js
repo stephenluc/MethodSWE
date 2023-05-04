@@ -34,7 +34,7 @@ async function processPayment(payment) {
 async function updatePaymentsStatus(batchId) {
     const payments = await Payment.find({ batchId });
 
-    for (let payment of payments) {
+    await payments.map(async (payment) => {
         const { paymentId, status } = payment;
         try {
             if (!TERMINAL_STATES.includes(status)) {
@@ -49,7 +49,7 @@ async function updatePaymentsStatus(batchId) {
         } catch (error) {
             console.error(`Unable to update payment ${paymentId}: ${error}`);
         }
-    }
+    });
 }
 
 module.exports = { createPayment, processPayment, updatePaymentsStatus }

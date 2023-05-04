@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
 		const paymentBatch = await PaymentBatch.find().sort( {createdDate: -1 });
 	    return res.status(200).send(paymentBatch);
 	} catch (err) {
-		console.log(err);
+		console.error(err);
 		return res.status(500);
 	}
 });
@@ -31,7 +31,7 @@ router.put('/:id/:status', async (req, res) => {
 			return res.status(200).send('Processing payment batch');
 		}
     } catch (err) {
-		console.log(err);
+		console.error(err);
 		return res.status(500);
 	}
 });

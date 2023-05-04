@@ -53,15 +53,13 @@ const buildStatusChip = (status) => {
     );
 };
 
-const buildPendingButtons = (paymentId, status, refetchPaymentBatches) => {
+const buildPendingButtons = (paymentId, refetchPaymentBatches) => {
     const onPendingClick = async (paymentId, didAccept) => {
       await updatePendingPaymentBatch(paymentId, didAccept)
       refetchPaymentBatches();
     };
-    const isPending = status === "pending";
     return (
       <Stack spacing={1.5} direction="row" justifyContent="flex-end" alignItems="center">
-        {isPending && (
           <Button
             size="small"
             variant="contained"
@@ -70,8 +68,6 @@ const buildPendingButtons = (paymentId, status, refetchPaymentBatches) => {
           >
             Accept
           </Button>
-          )}
-        {isPending && (
           <Button 
             size="small"
             variant="contained"
@@ -80,7 +76,6 @@ const buildPendingButtons = (paymentId, status, refetchPaymentBatches) => {
           >
             Reject
           </Button>
-        )}
       </Stack>
     );
 };
@@ -90,6 +85,15 @@ function ListEntry({ payment, isOpen, onCollapseClick, refetchPaymentBatches }) 
 	const { totalFunds, fileName, createdDate, numOfPayments } = payment;
 	const formattedDate = new Date(createdDate).toLocaleString('en-US');
 	const status = payment.status;
+  const isUploading =  status === "uploading";
+  const isPending = status === "pending";
+
+  const onEntryClick = () => {
+    if (!isUploading) {
+      onCollapseClick(paymentId)
+    }
+  }
+
   return (
     <>
       <ListItemButton alignItems="center">
@@ -97,16 +101,20 @@ function ListEntry({ payment, isOpen, onCollapseClick, refetchPaymentBatches }) 
         	justifyContent="flex-start"
 	  	    alignItems="center"
         	direction="row"
-        	sx={{ width: '90%'}}
-        	onClick={() => onCollapseClick(paymentId)
-        }>
-          <ListItemText sx={{ 'flex-grow': 0, mr: 5 }} primary={fileName} secondary={formattedDate} />
-          <ListItemText primary={`Total Paid: $${totalFunds}`} secondary={`Number of Payments: ${numOfPayments}`}/>
+        	sx={{ width: '100%'}}
+        	onClick={() => onEntryClick()}
+        >
+          <ListItemText 
+            sx={{ 'flex-grow': 0, mr: 5, width: 200 }}
+            primary={fileName}
+            secondary={formattedDate}
+          />
+          {!isUploading && <ListItemText primary={`Total Paid: $${totalFunds}`} secondary={`Number of Payments: ${numOfPayments}`}/>}
         </Stack>
-        {buildPendingButtons(paymentId, status, refetchPaymentBatches)}
+        {isPending && buildPendingButtons(paymentId, refetchPaymentBatches)}
         <Stack
           sx={{ pl: 2 }}
-          onClick={() => onCollapseClick(paymentId)}
+          onClick={() => onEntryClick()}
           alignItems="center"
           direction="row"
         >

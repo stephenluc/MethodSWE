@@ -7,7 +7,7 @@ function dollarToCents(num) {
 }
 
 function toDollarNum(num) {
-	return num / 100;
+	return (num / 100).toFixed(2);
 }
 
 function toDollarStr(num) {

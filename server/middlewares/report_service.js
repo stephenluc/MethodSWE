@@ -26,10 +26,28 @@ async function generateFundsPerSource(batchId) {
     },
     {
       $project: {
-        totalAmount: { $sum: "$amount" },
-        corpId: { $arrayElemAt: [ "$corporation.corpId", 0 ] },
+        amount: "$amount",
+        corpId: {
+          $arrayElemAt: ["$corporation.corpId", 0],
+        },
         _id: 0,
       },
+    },
+    {
+      $group: {
+        _id: "$corpId",
+        totalAmount: {
+          $sum: "$amount",
+        },
+      },
+    },
+    {
+      $project:
+        {
+          totalAmount: "$totalAmount",
+          corpId: "$_id",
+          _id: 0,
+        },
     },
   ]);
   const response = payments.map((payment) => {
@@ -64,10 +82,27 @@ async function generateFundsPerBranch(batchId) {
     },
     {
       $project: {
-        totalAmount: { $sum: "$amount" },
+        amount: "$amount",
         branchId: { $arrayElemAt: [ "$individual.branchId", 0 ] },
         _id: 0,
       },
+    },
+
+    {
+      $group: {
+        _id: "$branchId",
+        totalAmount: {
+          $sum: "$amount",
+        },
+      },
+    },
+    {
+      $project:
+        {
+          totalAmount: "$totalAmount",
+          branchId: "$_id",
+          _id: 0,
+        },
     },
   ]);
   const response = payments.map((payment) => {

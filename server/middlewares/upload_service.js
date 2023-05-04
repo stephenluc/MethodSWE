@@ -1,4 +1,4 @@
-const PaymentBatch = require('../models/PaymentBatchModel');
+ const PaymentBatch = require('../models/PaymentBatchModel');
 const {
   Address,
   Employee,
@@ -14,53 +14,7 @@ const { fetchPayee } = require('../middlewares/payee_service');
 const { fetchCorporation } = require('../middlewares/corporation_service');
 const { fetchMerchant } = require('../middlewares/merchant_service');
 const { fetchIndividual } = require('../middlewares/individual_service');
-
-function compileBatchSummary(payments) {
-  let totalFunds = 0;
-  const fundsPerBranch = new Map();
-  const fundsPerSource = new Map();
-  let numOfPayments = 0;
-  let numOfInvalidRecords = 0;
-
-  payments.forEach((payment) => {
-    if (validatePayment(payment)) {
-      const amount = toCents(payment.Amount);
-
-      // estimate funds per branch
-      const dunkinBranch = payment.Employee.DunkinBranch;
-      const fundAtBranch = fundsPerBranch.get(dunkinBranch) || 0;
-      fundsPerBranch.set(dunkinBranch, fundAtBranch + amount);
-
-      // estimate funds per source
-      const sourceId = payment.Payor.DunkinId;
-      const fundAtSource = fundsPerSource.get(sourceId) || 0;
-      fundsPerSource.set(sourceId, fundAtSource + amount);
-
-      // total amount of funds giving out
-      totalFunds += amount;
-      numOfPayments++;
-    } else {
-      numOfInvalidRecords++;
-    } 
-  });
-
-  for (const [key, value] of fundsPerBranch) {
-    fundsPerBranch.set(key, toDollarNum(value));
-  }
-
-  for (const [key, value] of fundsPerSource) {
-    fundsPerSource.set(key, toDollarNum(value));
-  }
-
-  totalFunds = toDollarNum(totalFunds)
-  return {
-    totalFunds,
-    fundsPerBranch,
-    fundsPerSource,
-    numOfPayments,
-    numOfInvalidRecords
-  };
-}
+const { generateReport } = require('../middlewares/report_service');
 
 async function buildPayment(batchId, payment) {
   try {
@@ -69,10 +23,10 @@ async function buildPayment(batchId, payment) {
     const amount = toCents(payment.Amount);
 
     const record = await createPayment(batchId, payor.accId, payee.accId, amount);
-    console.log(`built payment: ${record}`);
     return record;
   } catch (err) {
     console.error(`Error while building payment: ${err.message}`);
+    return Promise.resolve(null);
   }
 }
 
@@ -83,36 +37,59 @@ async function parseFromFile(data, fileName) {
       fileName: fileName,
       status: "uploading"
     });
-
+    batchRecord.save();
     const dataList = toList(data);
+
     // iterate through all the rows in the xml file, ignore malformed rows
     Promise.all(dataList.map(async (payment) => {
       if (validatePayment(payment)) {
-        await buildPayment(batchRecord._id, payment);
+        return await buildPayment(batchRecord._id, payment);
       }
-    })).then(async () => {
-      await PaymentBatch.updateOne({ _id: batchRecord._id }, { status: 'pending' });
-      console.log("All payments have been processed successfully.");
+    })).then(async (res) => {
+      let count = 0;
+      const totalAmount = res.reduce((acc, cur) => {
+        if (cur === null) {
+          return acc;
+        }
+        count++;
+        return acc + cur.amount;
+      }, 0);
+      
+      const sourceReport = await generateReport(batchRecord._id, "funds_per_source");
+      const fundsPerSource = new Map();
+      sourceReport.forEach((source) => {
+          // funds per source
+          const corpId = source.corpId;
+          const totalAmount = toDollarNum(toCents(source.totalAmount));
+          fundsPerSource.set(corpId, totalAmount);
+      });
+
+      const branchReport = await generateReport(batchRecord._id, "funds_per_branch");
+      const fundsPerBranch = new Map();
+      branchReport.forEach((branch) => {
+          // funds per branch
+          const branchId = branch.branchId;
+          const totalAmount = toDollarNum(toCents(branch.totalAmount));
+          fundsPerBranch.set(branchId, totalAmount);
+      });
+
+      await PaymentBatch.updateOne(
+        { _id: batchRecord._id },
+        { 
+          status: 'pending',
+          numOfPayments: count,
+          fundsPerSource,
+          fundsPerBranch,
+          totalFunds: toDollarNum(totalAmount)
+        });
+      console.debug("All payments have been processed successfully.");
     }).catch((error) => {
       console.log(`Error processing payments: ${error}`);
     });
 
-    const {
-      totalFunds,
-      fundsPerBranch,
-      fundsPerSource,
-      numOfPayments,
-      numOfInvalidRecords
-    } = compileBatchSummary(dataList);
-
-    batchRecord.totalFunds = totalFunds;
-    batchRecord.fundsPerBranch = fundsPerBranch;
-    batchRecord.fundsPerSource = fundsPerSource;
-    batchRecord.numOfPayments = numOfPayments;
-    batchRecord.save();
     return batchRecord;
   } catch (e) {
-    console.log("error while parsing file:", e);
+    console.error("error while parsing file:", e);
   }
 }
 
