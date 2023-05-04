@@ -33,7 +33,6 @@ export default function HomeView() {
     };
     fetch();
   }, []);
-
   const onUploadResponse = (res) => {
     setSnackBar({isOpen: true, uploadRes: res})
   };
@@ -53,7 +52,9 @@ export default function HomeView() {
         onUploadResponse={onUploadResponse}
         refetchPaymentBatches={fetchPaymentBatches}
       /> 
-      {paymentBatches.length === 0 ? (<h3>No Files Have Been Submited</h3>): (
+      {!paymentBatches ? (
+        <h3>No Files Have Been Submited</h3>
+      ) : (
         <ListView 
           paymentBatches={paymentBatches}
           refetchPaymentBatches={fetchPaymentBatches}

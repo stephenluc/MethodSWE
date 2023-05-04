@@ -82,7 +82,7 @@ async function parseFromFile(data, fileName) {
           fundsPerBranch,
           totalFunds: toDollarNum(totalAmount)
         });
-      console.debug("All payments have been processed successfully.");
+      console.debug("All payments have been uploaded successfully.");
     }).catch((error) => {
       console.log(`Error processing payments: ${error}`);
     });

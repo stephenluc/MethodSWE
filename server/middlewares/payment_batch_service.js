@@ -9,20 +9,21 @@ async function processBatch(batchId) {
 		{ status: 'processing' }
 	);
 	const payments = await Payment.find({ batchId });
-	let totalPaidAmount = 0;
-	for (let payment of payments) {
+	Promise.all(payments.map(async (payment) => {
 		try {
 			await processPayment(payment);
-			totalPaidAmount += payment.amount;
 		} catch (error) {
 	        console.error(`Failed to process payment ${payment.source} to ${payment.destination} - ${error}`);
 	    }
-	}
-	totalPaidAmount = toDollarNum(totalPaidAmount);
-	await PaymentBatch.findOneAndUpdate(
-		{ _id: batchId },
-		{ status: 'completed',  totalFunds: totalPaidAmount }
-	);
+	})).then(async (res) => {
+		await PaymentBatch.findOneAndUpdate(
+			{ _id: batchId },
+			{ status: 'completed' }
+		);
+		console.debug("All payments have been submitted successfully.");
+	}).catch((error) => {
+      console.log(`Error submitting payments: ${error}`);
+    });
 }
 
 module.exports = { processBatch } 

@@ -1,5 +1,7 @@
 const Method = require('./method_services');
 const Payment = require('../models/PaymentModel');
+const { toList } = require('../middlewares/convertor_service');
+
 
 const TERMINAL_STATES = ['sent', 'canceled', 'reversed'];
 
@@ -33,8 +35,7 @@ async function processPayment(payment) {
 
 async function updatePaymentsStatus(batchId) {
     const payments = await Payment.find({ batchId });
-
-    await payments.map(async (payment) => {
+    const res = toList(payments).map(async (payment) => {
         const { paymentId, status } = payment;
         try {
             if (!TERMINAL_STATES.includes(status)) {
@@ -50,6 +51,7 @@ async function updatePaymentsStatus(batchId) {
             console.error(`Unable to update payment ${paymentId}: ${error}`);
         }
     });
+    return await Promise.all(res);
 }
 
 module.exports = { createPayment, processPayment, updatePaymentsStatus }
