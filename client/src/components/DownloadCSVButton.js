@@ -28,7 +28,6 @@ export default function DownloadCSVButton({ paymentId, title, canDownload }) {
   const onGenReportClick = async (batchId, reportName) => {
     setLoading(true);
     const report = await getReport(batchId, reportName);
-    console.log(report);
     const csvData = Papa.unparse(report);
     exportData(csvData, `${reportName}.csv`, 'text/csv;charset=utf-8;');
     setLoading(false);
