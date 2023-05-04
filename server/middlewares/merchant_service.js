@@ -35,7 +35,13 @@ async function fetchMerchant(plaidId) {
                 }
             }
             const methodMerchant = await Method.fetchMerchant(plaidId);
-            return await createMerchant(methodMerchant[0].mch_id, plaidId);
+            if (methodMerchant[0]) {
+                return await createMerchant(methodMerchant[0].mch_id, plaidId);
+            }
+            // plaidId ins_116527 doesn't return a merchant
+            console.error(`mchId doesn't exist for plaidId ${plaidId}`)
+            cache.set(plaidId, "doesn't exist");
+            return cache.get(plaidId);
         }
     } catch (err) {
         console.error(`Error in mechant fetch ${err}`)

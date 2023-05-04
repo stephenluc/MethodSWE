@@ -1,5 +1,5 @@
 function toCents(str) {
-    return parseInt(str.replace("$", "").replace(".", ""));
+    return parseInt(str.replace("$", "").replace(",","").replace(".", ""));
 }
 
 function dollarToCents(num) {
